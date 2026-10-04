@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>FRX Pixel Wars | 像素大戰</title>
+    <meta name="description" content="歡迎來到FRX Pixel Wars 全球官方像素大戰！與來自世界各地的玩家一同在 500x500 的巨型畫布上即時創作、放置像素，發揮創意與團隊合作守護你的像素領地！">
+    <meta name="keywords" content="Pixel Wars, 像素大戰, 線上畫布, 即時多人像素, Pixel Art, FRX">
+    
+    <link rel="icon" href="https://i.ibb.co/G4FNMK2M/photo-output.webp" type="image/webp">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/G4FNMK2M/photo-output.webp">
+    <meta name="google-site-verification" content="D2jjOhjMZmOG8zwCgpx7-W__kj6AS2vNOUrsyrp8OGA" />
+    <style>
+        :root {
+            --glass-bg: rgba(15, 15, 20, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.65);
+            --blur-strength: 32px;
+            --primary-accent: #3b82f6;
+        }
+
+        body {
+            margin: 0;
+            background-color: #070709;
+            color: #f1f1f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #12121a 0%, #070709 100%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 260px;
+        }
+
+        .loader-ring {
+            position: relative;
+            width: 76px;
+            height: 76px;
+            margin-bottom: 28px;
+        }
+
+        .loader-ring div {
+            box-sizing: border-box;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            margin: 6px;
+            border: 4px solid transparent;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: ring-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+
+        .loader-ring div:nth-child(1) { animation-delay: -0.45s; border-top-color: #3b82f6; }
+        .loader-ring div:nth-child(2) { animation-delay: -0.3s; border-top-color: #8b5cf6; }
+        .loader-ring div:nth-child(3) { animation-delay: -0.15s; border-top-color: #ec4899; }
+
+        @keyframes ring-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+            margin-bottom: 16px;
+        }
+
+        .loader-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+        }
+
+        .loader-text {
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #a1a1aa;
+            font-weight: 500;
+        }
+
+        #ui-stats {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            -webkit-backdrop-filter: blur(var(--blur-strength));
+            padding: 10px 14px;
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+            z-index: 20;
+            font-size: 11px;
+            line-height: 1.5;
+            border: 1px solid var(--glass-border);
+            pointer-events: auto;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .dot-online {
+            width: 7px;
+            height: 7px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .dot-views {
+            width: 7px;
+            height: 7px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        #ui-top {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            width: calc(100% - 170px);
+            max-width: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            -webkit-backdrop-filter: blur(var(--blur-strength));
+            padding: 8px 12px;
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        h1 { margin: 0; font-size: 13px; letter-spacing: 1px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        p { margin: 2px 0 0 0; font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grab;
+        }
+        #viewport:active { cursor: grabbing; }
+
+        #canvas-wrapper {
+            position: absolute;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+            background-color: white;
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 10px 10px;
+            transform-origin: 0 0;
+            border-radius: 8px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        #ui-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 94%;
+            max-width: 480px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .palette {
+            display: flex;
+            gap: 8px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            -webkit-backdrop-filter: blur(var(--blur-strength));
+            padding: 10px 16px;
+            border-radius: 35px;
+            box-shadow: var(--glass-shadow);
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            overflow-x: auto;
+            max-width: 100%;
+            scrollbar-width: none;
+        }
+        .palette::-webkit-scrollbar { display: none; }
+
+        .color-btn {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s;
+        }
+        .color-btn.active {
+            border-color: #ffffff;
+            transform: scale(1.18);
+            box-shadow: 0 0 16px rgba(255,255,255,0.7);
+        }
+        
+        .color-custom-label {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff, #ff00ff, #ff0000);
+            box-sizing: border-box;
+            display: block;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s;
+        }
+        .color-custom-label.active {
+            border-color: #ffffff;
+            transform: scale(1.18);
+            box-shadow: 0 0 16px rgba(255,255,255,0.7);
+        }
+        #custom-color-picker {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+        .floating-buttons {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            z-index: 20;
+        }
+
+        .float-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            -webkit-backdrop-filter: blur(var(--blur-strength));
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+        }
+        .float-btn:hover {
+            transform: scale(1.12);
+        }
+
+        #discord-btn img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        #youtube-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        #captcha-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(7, 7, 9, 0.85);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .captcha-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            -webkit-backdrop-filter: blur(var(--blur-strength));
+            border: 1px solid var(--glass-border);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            text-align: center;
+            width: 85%;
+            max-width: 320px;
+        }
+        .captcha-box h2 {
+            margin-top: 0;
+            font-size: 17px;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+        .captcha-box p {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 18px;
+        }
+        .captcha-game-area {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 12px;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        .target-dot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 16px #22c55e;
+            cursor: pointer;
+        }
+        .captcha-error {
+            color: #ef4444;
+            font-size: 11px;
+            margin-top: 6px;
+            display: none;
+        }
+    </style>
+
+    <!-- SDK (Compat 核心與服務) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+    <!-- 載入中遮罩畫面 -->
+    <div id="loader-overlay">
+        <div class="loader-container">
+            <div class="loader-ring">
+                <div></div><div></div><div></div>
+            </div>
+            <div class="loader-progress-track">
+                <div class="loader-progress-bar" id="loader-bar"></div>
+            </div>
+            <div class="loader-text" id="loader-text-status">正在載入伺服器...</div>
+        </div>
+    </div>
+
+    <!-- 驗證碼遮罩畫面 -->
+    <div id="captcha-overlay" style="display:none;">
+        <div class="captcha-box">
+            <h2>安全驗證</h2>
+            <p>請點擊綠色圓點以證明您不是機器人或是自動化程式[span_1](start_span)[span_1](end_span)</p>
+            <div class="captcha-game-area" id="captcha-area"></div>
+            <div class="captcha-error" id="captcha-error">請點擊綠色圓點[span_2](start_span)[span_2](end_span)</div>
+        </div>
+    </div>
+
+    <div id="ui-stats">
+        <div class="stat-item"><span class="dot-online"></span> 在線人數：<span id="online-count">0</span> 人</div>
+        <div class="stat-item"><span class="dot-views"></span> 瀏覽次數：<span id="view-count">0</span> 次</div>
+    </div>
+
+    <div id="ui-top">
+        <h1>FRX Pixel Wars</h1>
+        <p id="status">點擊畫布放置像素！</p>
+    </div>
+
+    <div class="floating-buttons">
+        <a href="https://www.youtube.com/@frx2027" target="_blank" id="youtube-btn" class="float-btn" title="官方 YouTube">
+            <svg viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+        </a>
+        <a href="https://frx-tau.vercel.app/" target="_blank" id="discord-btn" class="float-btn" title="官方網站">
+            <img src="https://i.ibb.co/0jDBgxVc/FRX.png" alt="Logo">
+        </a>
+    </div>
+
+    <div id="viewport">
+        <div id="canvas-wrapper">
+            <canvas id="pixelCanvas"></canvas>
+        </div>
+    </div>
+
+    <div id="ui-bottom">
+        <div class="palette" id="palette">
+            <div class="color-btn active" style="background-color: #000000;" data-color="#000000" title="純黑"></div>
+            <div class="color-btn" style="background-color: #ffffff;" data-color="#ffffff" title="純白"></div>
+            <div class="color-btn" style="background-color: #ff0000;" data-color="#ff0000" title="紅"></div>
+            <div class="color-btn" style="background-color: #00ff00;" data-color="#00ff00" title="綠"></div>
+            <div class="color-btn" style="background-color: #0055ff;" data-color="#0055ff" title="藍"></div>
+            <div class="color-btn" style="background-color: #ffff00;" data-color="#ffff00" title="黃"></div>
+            <div class="color-btn" style="background-color: #ff00ff;" data-color="#ff00ff" title="洋紅"></div>
+            <div class="color-btn" style="background-color: #00ffff;" data-color="#00ffff" title="青"></div>
+            <div class="color-btn" style="background-color: #ff7700;" data-color="#ff7700" title="橘"></div>
+            <div class="color-btn" style="background-color: #8b00ff;" data-color="#8b00ff" title="紫"></div>
+            
+            <label class="color-custom-label" id="custom-color-label" for="custom-color-picker" title="自訂顏色"></label>
+            <input type="color" id="custom-color-picker" value="#ff0000">
+        </div>
+    </div>
+
+    <script>
+        // 禁絕右鍵與開發者工具快捷鍵 (防作弊)
+        (function() {
+            window.addEventListener('contextmenu', e => e.preventDefault());
+            window.addEventListener('keydown', e => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','i','J','j','C','c'].includes(e.key)) || (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                }
+            });
+        })();
+
+        // 載入進度條動畫
+        let loadProgress = 0;
+        const progressBar = document.getElementById('loader-bar');
+        const progressText = document.getElementById('loader-text-status');
+        
+        const progressInterval = setInterval(() => {
+            if (loadProgress < 95) {
+                loadProgress += Math.random() * 1.5 + 0.5;
+                if (loadProgress > 95) loadProgress = 95;
+                if (progressBar) progressBar.style.width = loadProgress + '%';
+                if (progressText) progressText.innerText = `正在載入伺服器與地圖資源 (${Math.floor(loadProgress)}%)`;
+            }
+        }, 200);
+
+        // 驗證碼邏輯
+        function spawnCaptchaDot() {
+            const area = document.getElementById('captcha-area');
+            if (!area) return;
+            area.innerHTML = '';
+            const dot = document.createElement('div');
+            dot.className = 'target-dot';
+            const maxX = area.clientWidth - 35;
+            const maxY = area.clientHeight - 35;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX));
+            const ry = Math.floor(Math.random() * Math.max(10, maxY));
+            dot.style.left = rx + 'px';
+            dot.style.top = ry + 'px';
+            dot.onclick = (e) => {
+                e.stopPropagation();
+                passCaptcha();
+            };
+            area.onclick = () => {
+                const err = document.getElementById('captcha-error');
+                if (err) err.style.display = 'block';
+                spawnCaptchaDot();
+            };
+            area.appendChild(dot);
+        }
+
+        function checkCaptchaSession() {
+            const lastVerified = localStorage.getItem('frx_captcha_time');
+            const now = Date.now();
+            const captchaOverlay = document.getElementById('captcha-overlay');
+            if (lastVerified && (now - parseInt(lastVerified, 10) < 30 * 60 * 1000)) {
+                if (captchaOverlay) captchaOverlay.style.display = 'none';
+            } else {
+                if (captchaOverlay) captchaOverlay.style.display = 'flex';
+                setTimeout(spawnCaptchaDot, 100);
+            }
+        }
+
+        function passCaptcha() {
+            localStorage.setItem('frx_captcha_time', Date.now());
+            const overlay = document.getElementById('captcha-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            }
+        }
+        
+        checkCaptchaSession();
+
+        // Firebase 設置
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTZb5Fphxpr_54XBWbrIzyW5uspJzhwak",
+            authDomain: "frx67-2a892.firebaseapp.com",
+            projectId: "frx67-2a892",
+            storageBucket: "frx67-2a892.firebasestorage.app",
+            messagingSenderId: "294732115344",
+            appId: "1:294732115344:web:5fa6b8f2a6d86b2dfe1715",
+            measurementId: "G-5CECYP5JYK",
+            databaseURL: "https://frx67-2a892-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const pixelsRef = db.ref('pixels');
+
+        let currentUser = null;
+        let sessionConnectedRef = null;
+
+        auth.signInAnonymously().then(() => {
+            console.log("登入成功！");
+        }).catch((error) => {
+            console.error("登入失敗：", error);
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                const sessionId = '_' + Math.random().toString(36).substr(2, 9);
+                sessionConnectedRef = db.ref(`stats/connections/${user.uid}${sessionId}`);
+
+                db.ref('.info/connected').on('value', (snapshot) => {
+                    if (snapshot.val() === true) {
+                        sessionConnectedRef.onDisconnect().remove();
+                        sessionConnectedRef.set(true);
+                    }
+                });
+            } else {
+                currentUser = null;
+            }
+        });
+
+        const onlineCountEl = document.getElementById('online-count');
+        const viewCountEl = document.getElementById('view-count');
+
+        db.ref('stats/totalViews').on('value', (snap) => {
+            if(snap.exists() && viewCountEl) viewCountEl.innerText = snap.val();
+        });
+        db.ref('stats/totalViews').transaction((current) => (current || 0) + 1);
+
+        const connectionsRef = db.ref('stats/connections');
+        connectionsRef.on('value', (snap) => {
+            if (onlineCountEl) onlineCountEl.innerText = snap.numChildren();
+        });
+
+        const viewport = document.getElementById('viewport');
+        const wrapper = document.getElementById('canvas-wrapper');
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const palette = document.getElementById('palette');
+        
+        const customColorPicker = document.getElementById('custom-color-picker');
+        const customColorLabel = document.getElementById('custom-color-label');
+
+        const MAP_SIZE = 500; 
+        const CELL_SIZE = 10;
+
+        wrapper.style.width = (MAP_SIZE * CELL_SIZE) + 'px';
+        wrapper.style.height = (MAP_SIZE * CELL_SIZE) + 'px';
+        canvas.width = MAP_SIZE;
+        canvas.height = MAP_SIZE;
+        ctx.imageSmoothingEnabled = false;
+
+        let scale = 1;         
+        let offsetX = 0;       
+        let offsetY = 0;       
+        let isDragging = false;
+        let startX, startY;
+        let touchStartDist = 0; 
+        let startScale = 1;
+        let isPanning = false;  
+        let selectedColor = '#000000';
+        let isPlacingPixel = false; // 執行鎖
+
+        const localMap = {}; 
+        let isLoadedFirstTime = false;
+        
+        let renderRequested = false;
+        function requestRender() {
+            if (!renderRequested) {
+                renderRequested = true;
+                requestAnimationFrame(() => {
+                    renderRequested = false;
+                    render();
+                });
+            }
+        }
+
+        function hideLoader() {
+            if (!isLoadedFirstTime) {
+                isLoadedFirstTime = true;
+                clearInterval(progressInterval);
+                if (progressBar) progressBar.style.width = '100%';
+                if (progressText) progressText.innerText = "載入完成！";
+                setTimeout(() => {
+                    const loader = document.getElementById('loader-overlay');
+                    if (loader) {
+                        loader.style.opacity = '0';
+                        setTimeout(() => { loader.style.display = 'none'; }, 800);
+                    }
+                }, 400);
+            }
+        }
+
+        function centerCanvas() {
+            scale = Math.min(window.innerWidth, window.innerHeight) / (MAP_SIZE * CELL_SIZE) * 0.9;
+            offsetX = (window.innerWidth - (MAP_SIZE * CELL_SIZE) * scale) / 2;
+            offsetY = (window.innerHeight - (MAP_SIZE * CELL_SIZE) * scale) / 2;
+            requestRender();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let key in localMap) {
+                const [x, y] = key.split(',').map(Number);
+                ctx.fillStyle = localMap[key];
+                ctx.fillRect(x, y, 1, 1);
+            }
+            if (scale > 0.8) {
+                wrapper.style.backgroundImage = `
+                    linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px)
+                `;
+            } else {
+                wrapper.style.backgroundImage = `
+                    linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
+                `;
+            }
+            wrapper.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+            hideLoader();
+        }
+
+        pixelsRef.on('child_added', (snapshot) => {
+            const key = snapshot.key;
+            const data = snapshot.val();
+            const cleanKey = key.replace('x', '').replace('y', '').replace('_', ',');
+            localMap[cleanKey] = data.color;
+            requestRender();
+        });
+
+        pixelsRef.on('child_changed', (snapshot) => {
+            const key = snapshot.key;
+            const data = snapshot.val();
+            const cleanKey = key.replace('x', '').replace('y', '').replace('_', ',');
+            localMap[cleanKey] = data.color;
+            requestRender();
+        });
+
+        pixelsRef.on('child_removed', (snapshot) => {
+            const key = snapshot.key;
+            const cleanKey = key.replace('x', '').replace('y', '').replace('_', ',');
+            delete localMap[cleanKey];
+            requestRender();
+        });
+
+        function tryPlacePixel(clickX, clickY) {
+            if (isPlacingPixel) return;
+            if (!currentUser) {
+                alert("正在建立安全連線，請稍後再試！");
+                return;
+            }
+            if (clickX >= 0 && clickX < MAP_SIZE && clickY >= 0 && clickY < MAP_SIZE) {
+                isPlacingPixel = true;
+                const dbKey = `x${clickX}_y${clickY}`;
+                
+                const updates = {};
+                updates[`/pixels/${dbKey}`] = {
+                    color: selectedColor,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    uid: currentUser.uid
+                };
+
+                db.ref().update(updates).then(() => {
+                    isPlacingPixel = false;
+                }).catch((error) => {
+                    console.error("寫入被拒絕或發生錯誤：", error);
+                    isPlacingPixel = false;
+                });
+            }
+        }
+
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.palette') || e.target.closest('.floating-buttons') || document.getElementById('captcha-overlay').style.display !== 'none') return;
+            isDragging = true;
+            isPanning = false;
+            startX = e.clientX - offsetX;
+            startY = e.clientY - offsetY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            isPanning = true;
+            offsetX = e.clientX - startX;
+            offsetY = e.clientY - startY;
+            requestRender();
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            if (!isPanning && !e.target.closest('.palette') && !e.target.closest('.floating-buttons') && document.getElementById('captcha-overlay').style.display === 'none') {
+                const clickX = Math.floor((e.clientX - offsetX) / (scale * CELL_SIZE));
+                const clickY = Math.floor((e.clientY - offsetY) / (scale * CELL_SIZE));
+                tryPlacePixel(clickX, clickY);
+            }
+        });
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = 1.15;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const canvasX = (mouseX - offsetX) / scale;
+            const canvasY = (mouseY - offsetY) / scale;
+
+            if (e.deltaY < 0) scale *= zoomFactor;
+            else scale /= zoomFactor;
+            scale = Math.max(0.05, Math.min(scale, 25));
+
+            offsetX = mouseX - canvasX * scale;
+            offsetY = mouseY - canvasY * scale;
+            requestRender();
+        }, { passive: false });
+
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.palette') || e.target.closest('.floating-buttons') || document.getElementById('captcha-overlay').style.display !== 'none') return;
+            if (e.touches.length === 1) {
+                isDragging = true;
+                isPanning = false;
+                startX = e.touches[0].clientX - offsetX;
+                startY = e.touches[0].clientY - offsetY;
+            } else if (e.touches.length === 2) {
+                isDragging = false; 
+                startScale = scale;
+                touchStartDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            }
+        });
+
+        viewport.addEventListener('touchmove', (e) => {
+            if (e.target.closest('.palette') || e.target.closest('.floating-buttons')) return;
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging) {
+                isPanning = true;
+                offsetX = e.touches[0].clientX - startX;
+                offsetY = e.touches[0].clientY - startY;
+                requestRender();
+            } else if (e.touches.length === 2) {
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const factor = dist / touchStartDist;
+                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const canvasX = (midX - offsetX) / scale;
+                const canvasY = (midY - offsetY) / scale;
+
+                scale = Math.max(0.05, Math.min(startScale * factor, 25));
+                offsetX = midX - canvasX * scale;
+                offsetY = midY - canvasY * scale;
+                requestRender();
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchend', (e) => {
+            if (e.touches.length > 0) {
+                isDragging = false;
+                return;
+            }
+            if (isDragging && !isPanning && e.changedTouches.length === 1) {
+                const touch = e.changedTouches[0];
+                if (!e.target.closest('.palette') && !e.target.closest('.floating-buttons') && document.getElementById('captcha-overlay').style.display === 'none') {
+                    const clickX = Math.floor((touch.clientX - offsetX) / (scale * CELL_SIZE));
+                    const clickY = Math.floor((touch.clientY - offsetY) / (scale * CELL_SIZE));
+                    tryPlacePixel(clickX, clickY);
+                }
+            }
+            isDragging = false;
+            isPanning = false;
+        });
+
+        palette.addEventListener('click', (e) => {
+            if (e.target.classList.contains('color-btn')) {
+                const activeBtn = document.querySelector('.color-btn.active') || document.querySelector('.color-custom-label.active');
+                if (activeBtn) activeBtn.classList.remove('active');
+                e.target.classList.add('active');
+                selectedColor = e.target.getAttribute('data-color');
+            }
+        });
+
+        customColorPicker.addEventListener('input', (e) => {
+            const activeBtn = document.querySelector('.color-btn.active') || document.querySelector('.color-custom-label.active');
+            if (activeBtn) activeBtn.classList.remove('active');
+            customColorLabel.classList.add('active');
+            selectedColor = e.target.value;
+            customColorLabel.style.background = selectedColor;
+        });
+        
+        customColorLabel.addEventListener('click', () => {
+            const activeBtn = document.querySelector('.color-btn.active') || document.querySelector('.color-custom-label.active');
+            if (activeBtn) activeBtn.classList.remove('active');
+            customColorLabel.classList.add('active');
+            selectedColor = customColorPicker.value;
+        });
+
+        window.addEventListener('resize', () => { requestRender(); });
+        centerCanvas();
+    </script>
+</body>
+</html>
