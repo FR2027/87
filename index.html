@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>FRX Pixel Wars | 自由創作模式</title>
-    <meta name="description" content="FRX Pixel Wars 自由創作模式：完全無冷卻、支援圖片蓋章與自由筆刷塗鴉！">
+    <title>FRX Pixel Wars | 自由極速畫布</title>
     
     <link rel="icon" href="https://i.ibb.co/G4FNMK2M/photo-output.webp" type="image/webp">
     <style>
         :root {
-            --glass-bg: rgba(15, 15, 20, 0.75);
+            --glass-bg: rgba(15, 15, 20, 0.85);
             --glass-border: rgba(255, 255, 255, 0.18);
             --glass-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.65);
-            --blur-strength: 32px;
             --primary-accent: #3b82f6;
         }
 
@@ -40,8 +38,8 @@
             pointer-events: auto;
             padding: 8px 16px;
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
-            -webkit-backdrop-filter: blur(var(--blur-strength));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: 18px;
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
@@ -62,7 +60,7 @@
         #canvas-wrapper {
             position: absolute;
             box-shadow: 0 30px 80px rgba(0,0,0,0.9);
-            background-color: white;
+            background-color: #ffffff;
             transform-origin: 0 0;
             border-radius: 4px;
         }
@@ -75,7 +73,6 @@
             image-rendering: crisp-edges;
         }
 
-        /* 底部控制列 */
         #ui-bottom {
             position: absolute;
             bottom: 20px;
@@ -94,7 +91,7 @@
             display: flex;
             gap: 8px;
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
+            backdrop-filter: blur(16px);
             padding: 6px 12px;
             border-radius: 20px;
             border: 1px solid var(--glass-border);
@@ -121,7 +118,7 @@
             display: flex;
             gap: 8px;
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
+            backdrop-filter: blur(16px);
             padding: 10px 16px;
             border-radius: 35px;
             box-shadow: var(--glass-shadow);
@@ -141,11 +138,10 @@
             border: 2px solid rgba(255,255,255,0.15);
             cursor: pointer;
             box-sizing: border-box;
-            transition: transform 0.2s, border-color 0.2s;
         }
         .color-btn.active {
             border-color: #ffffff;
-            transform: scale(1.2);
+            transform: scale(1.15);
             box-shadow: 0 0 12px rgba(255,255,255,0.8);
         }
         
@@ -161,33 +157,25 @@
         }
         #custom-color-picker { display: none; }
 
-        /* 圖片印章調控面板 */
         #stamp-panel {
             display: none;
             position: absolute;
             top: 70px;
             right: 20px;
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
+            backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             padding: 16px;
             border-radius: 16px;
             z-index: 30;
-            width: 220px;
+            width: 200px;
             box-shadow: var(--glass-shadow);
             font-size: 12px;
         }
         #stamp-panel h3 { margin: 0 0 10px 0; font-size: 14px; color: #fff; }
         .control-group { margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
         .control-group label { color: #94a3b8; }
-        .control-group input[type="range"], .control-group input[type="number"] {
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 4px;
-            border-radius: 6px;
-        }
+        .control-group input[type="range"] { width: 100%; }
         .stamp-action-btn {
             width: 100%;
             padding: 8px;
@@ -199,7 +187,6 @@
             cursor: pointer;
             margin-top: 6px;
         }
-        .stamp-action-btn:hover { background: #16a34a; }
         .stamp-cancel-btn {
             width: 100%;
             padding: 6px;
@@ -228,14 +215,12 @@
             align-items: center;
             justify-content: center;
             background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
-            box-shadow: var(--glass-shadow);
             border: 1px solid var(--glass-border);
+            color: white;
             cursor: pointer;
         }
     </style>
 
-    <!-- SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -244,23 +229,18 @@
 
     <div id="ui-top">
         <h1>FRX Pixel Wars</h1>
-        <p>⚡ 自由模式：無冷卻 / 畫筆 / 圖片蓋章</p>
+        <p id="status-text">⚡ 畫布載入中...</p>
     </div>
 
     <div class="floating-buttons">
         <button class="float-btn" onclick="centerCanvas()" title="重置視角">🎯</button>
     </div>
 
-    <!-- 圖片印章控制面板 -->
     <div id="stamp-panel">
         <h3>印章設置</h3>
         <div class="control-group">
-            <label>寬度 (像素): <span id="stamp-w-val">50</span></label>
-            <input type="range" id="stamp-width" min="10" max="200" value="50">
-        </div>
-        <div class="control-group">
-            <label>位置 X: <input type="number" id="stamp-x" value="0"></label>
-            <label>位置 Y: <input type="number" id="stamp-y" value="0"></label>
+            <label>寬度: <span id="stamp-w-val">40</span> px</label>
+            <input type="range" id="stamp-width" min="10" max="100" value="40">
         </div>
         <button class="stamp-action-btn" onclick="applyStamp()">直接蓋章下去！</button>
         <button class="stamp-cancel-btn" onclick="cancelStamp()">取消圖片</button>
@@ -275,7 +255,7 @@
 
     <div id="ui-bottom">
         <div class="tool-bar">
-            <button class="tool-btn active" id="mode-draw" onclick="switchMode('draw')">✏️ 單點/塗鴉</button>
+            <button class="tool-btn active" id="mode-draw" onclick="switchMode('draw')">✏️ 塗鴉筆刷</button>
             <button class="tool-btn" id="mode-pan" onclick="switchMode('pan')">✋ 拖動視角</button>
             <button class="tool-btn" onclick="document.getElementById('image-uploader').click()">🖼️ 上傳圖片蓋章</button>
             <input type="file" id="image-uploader" accept="image/*" style="display:none;">
@@ -316,13 +296,13 @@
         const pixelsRef = db.ref('pixels');
 
         let currentUser = null;
-        auth.signInAnonymously().then().catch(console.error);
+        auth.signInAnonymously().catch(console.error);
         auth.onAuthStateChanged(user => { currentUser = user; });
 
         const viewport = document.getElementById('viewport');
         const wrapper = document.getElementById('canvas-wrapper');
         const canvas = document.getElementById('pixelCanvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
         const previewCanvas = document.getElementById('previewCanvas');
         const pCtx = previewCanvas.getContext('2d');
 
@@ -335,30 +315,46 @@
         canvas.height = MAP_SIZE;
         previewCanvas.width = MAP_SIZE;
         previewCanvas.height = MAP_SIZE;
-        ctx.imageSmoothingEnabled = false;
-        pCtx.imageSmoothingEnabled = false;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, MAP_SIZE, MAP_SIZE);
 
         let scale = 1, offsetX = 0, offsetY = 0;
         let isMouseDown = false;
         let selectedColor = '#000000';
-        let currentMode = 'draw'; // 'draw' | 'pan' | 'stamp'
+        let currentMode = 'draw'; 
         const localMap = {}; 
+        let pendingWrites = {};
 
-        // 印章相關 State
         let stampImage = null;
-        let stampX = 100, stampY = 100, stampW = 50, stampH = 50;
+        let stampX = 200, stampY = 200, stampW = 40, stampH = 40;
+
+        // requestAnimationFrame 渲染優化
+        let renderScheduled = false;
+        function scheduleRender() {
+            if (!renderScheduled) {
+                renderScheduled = true;
+                requestAnimationFrame(() => {
+                    renderScheduled = false;
+                    render();
+                });
+            }
+        }
 
         function centerCanvas() {
             scale = Math.min(window.innerWidth, window.innerHeight) / (MAP_SIZE * CELL_SIZE) * 0.9;
             offsetX = (window.innerWidth - (MAP_SIZE * CELL_SIZE) * scale) / 2;
             offsetY = (window.innerHeight - (MAP_SIZE * CELL_SIZE) * scale) / 2;
-            render();
+            scheduleRender();
         }
 
         function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, MAP_SIZE, MAP_SIZE);
             for (let key in localMap) {
-                const [x, y] = key.split(',').map(Number);
+                const commaIdx = key.indexOf(',');
+                const x = parseInt(key.substring(0, commaIdx));
+                const y = parseInt(key.substring(commaIdx + 1));
                 ctx.fillStyle = localMap[key];
                 ctx.fillRect(x, y, 1, 1);
             }
@@ -377,47 +373,60 @@
             }
         }
 
-        // Firebase 監聽
-        pixelsRef.on('child_added', snap => {
-            const cleanKey = snap.key.replace('x', '').replace('y', '').replace('_', ',');
-            localMap[cleanKey] = snap.val().color;
-            render();
+        // 載入 Firebase 數據 (限流處理)
+        pixelsRef.once('value', snap => {
+            const data = snap.val();
+            if (data) {
+                for (let k in data) {
+                    const cleanKey = k.replace('x', '').replace('y', '').replace('_', ',');
+                    localMap[cleanKey] = data[k].color;
+                }
+            }
+            document.getElementById('status-text').innerText = "⚡ 自由模式：就緒";
+            scheduleRender();
         });
+
         pixelsRef.on('child_changed', snap => {
             const cleanKey = snap.key.replace('x', '').replace('y', '').replace('_', ',');
             localMap[cleanKey] = snap.val().color;
-            render();
+            scheduleRender();
         });
 
-        // 完全無冷卻寫入
+        // 塗鴉寫入緩衝區 (100ms 批次上傳一次，解決卡頓)
+        setInterval(() => {
+            if (Object.keys(pendingWrites).length > 0) {
+                db.ref().update(pendingWrites);
+                pendingWrites = {};
+            }
+        }, 100);
+
         function placePixel(x, y) {
             if (x < 0 || x >= MAP_SIZE || y < 0 || y >= MAP_SIZE) return;
-            const dbKey = `x${x}_y${y}`;
-            const todayStr = new Date().toISOString().split('T')[0];
-            
-            // 本地快速預覽
-            localMap[`${x},${y}`] = selectedColor;
-            render();
+            const key = `${x},${y}`;
+            if (localMap[key] === selectedColor) return;
 
-            pixelsRef.child(dbKey).set({
+            localMap[key] = selectedColor;
+            scheduleRender();
+
+            const dbKey = `/pixels/x${x}_y${y}`;
+            const todayStr = new Date().toISOString().split('T')[0];
+            pendingWrites[dbKey] = {
                 color: selectedColor,
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
                 uid: currentUser ? currentUser.uid : 'anon',
                 date: todayStr
-            });
+            };
         }
 
-        // 切換模式
         function switchMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
             if(mode === 'draw') document.getElementById('mode-draw').classList.add('active');
             if(mode === 'pan') document.getElementById('mode-pan').classList.add('active');
             if(mode !== 'stamp') document.getElementById('stamp-panel').style.display = 'none';
-            renderPreview();
+            scheduleRender();
         }
 
-        // 上傳與處理印章
         document.getElementById('image-uploader').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -427,12 +436,10 @@
                 const img = new Image();
                 img.onload = () => {
                     stampImage = img;
-                    stampW = Math.min(100, img.width);
+                    stampW = Math.min(60, img.width);
                     stampH = Math.round(stampW * (img.height / img.width));
                     document.getElementById('stamp-width').value = stampW;
                     document.getElementById('stamp-w-val').innerText = stampW;
-                    document.getElementById('stamp-x').value = stampX;
-                    document.getElementById('stamp-y').value = stampY;
                     document.getElementById('stamp-panel').style.display = 'block';
                     switchMode('stamp');
                 };
@@ -448,10 +455,6 @@
             renderPreview();
         });
 
-        document.getElementById('stamp-x').addEventListener('input', (e) => { stampX = parseInt(e.target.value) || 0; renderPreview(); });
-        document.getElementById('stamp-y').addEventListener('input', (e) => { stampY = parseInt(e.target.value) || 0; renderPreview(); });
-
-        // 蓋章印下圖片（轉換為像素）
         function applyStamp() {
             if (!stampImage) return;
             const tempCanvas = document.createElement('canvas');
@@ -461,24 +464,18 @@
             tCtx.drawImage(stampImage, 0, 0, stampW, stampH);
 
             const imgData = tCtx.getImageData(0, 0, stampW, stampH).data;
-            const updates = {};
             const todayStr = new Date().toISOString().split('T')[0];
 
             for (let y = 0; y < stampH; y++) {
                 for (let x = 0; x < stampW; x++) {
                     const idx = (y * stampW + x) * 4;
-                    const a = imgData[idx + 3];
-                    if (a > 50) { // 透明度過濾
-                        const r = imgData[idx];
-                        const g = imgData[idx + 1];
-                        const b = imgData[idx + 2];
-                        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-
+                    if (imgData[idx + 3] > 50) { 
+                        const hex = "#" + ((1 << 24) + (imgData[idx] << 16) + (imgData[idx + 1] << 8) + imgData[idx + 2]).toString(16).slice(1);
                         const targetX = stampX + x;
                         const targetY = stampY + y;
                         if (targetX >= 0 && targetX < MAP_SIZE && targetY >= 0 && targetY < MAP_SIZE) {
                             localMap[`${targetX},${targetY}`] = hex;
-                            updates[`/pixels/x${targetX}_y${targetY}`] = {
+                            pendingWrites[`/pixels/x${targetX}_y${targetY}`] = {
                                 color: hex,
                                 timestamp: firebase.database.ServerValue.TIMESTAMP,
                                 uid: currentUser ? currentUser.uid : 'anon',
@@ -488,9 +485,8 @@
                     }
                 }
             }
-            db.ref().update(updates);
             cancelStamp();
-            render();
+            scheduleRender();
         }
 
         function cancelStamp() {
@@ -499,12 +495,8 @@
             switchMode('draw');
         }
 
-        // 滑鼠/觸控互動邏輯
         let lastX = 0, lastY = 0;
-
-        function getCanvasCoords(e) {
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        function getCanvasCoords(clientX, clientY) {
             return {
                 x: Math.floor((clientX - offsetX) / (scale * CELL_SIZE)),
                 y: Math.floor((clientY - offsetY) / (scale * CELL_SIZE))
@@ -516,17 +508,9 @@
             isMouseDown = true;
             lastX = e.clientX;
             lastY = e.clientY;
-
-            const pos = getCanvasCoords(e);
-            if (currentMode === 'draw') {
-                placePixel(pos.x, pos.y);
-            } else if (currentMode === 'stamp') {
-                stampX = pos.x;
-                stampY = pos.y;
-                document.getElementById('stamp-x').value = stampX;
-                document.getElementById('stamp-y').value = stampY;
-                renderPreview();
-            }
+            const pos = getCanvasCoords(e.clientX, e.clientY);
+            if (currentMode === 'draw') placePixel(pos.x, pos.y);
+            else if (currentMode === 'stamp') { stampX = pos.x; stampY = pos.y; renderPreview(); }
         });
 
         window.addEventListener('mousemove', (e) => {
@@ -534,17 +518,13 @@
             if (currentMode === 'pan') {
                 offsetX += e.clientX - lastX;
                 offsetY += e.clientY - lastY;
-                render();
+                scheduleRender();
             } else if (currentMode === 'draw') {
-                const pos = getCanvasCoords(e);
-                placePixel(pos.x, pos.y); // 比刷畫布塗鴉
+                const pos = getCanvasCoords(e.clientX, e.clientY);
+                placePixel(pos.x, pos.y);
             } else if (currentMode === 'stamp') {
-                const pos = getCanvasCoords(e);
-                stampX = pos.x;
-                stampY = pos.y;
-                document.getElementById('stamp-x').value = stampX;
-                document.getElementById('stamp-y').value = stampY;
-                renderPreview();
+                const pos = getCanvasCoords(e.clientX, e.clientY);
+                stampX = pos.x; stampY = pos.y; renderPreview();
             }
             lastX = e.clientX;
             lastY = e.clientY;
@@ -552,14 +532,13 @@
 
         window.addEventListener('mouseup', () => { isMouseDown = false; });
 
-        // 觸控事件支援 (筆刷塗鴉與移動)
         viewport.addEventListener('touchstart', (e) => {
             if (e.target.closest('#ui-bottom') || e.target.closest('#stamp-panel')) return;
             if (e.touches.length === 1) {
                 isMouseDown = true;
                 lastX = e.touches[0].clientX;
                 lastY = e.touches[0].clientY;
-                const pos = getCanvasCoords(e);
+                const pos = getCanvasCoords(lastX, lastY);
                 if (currentMode === 'draw') placePixel(pos.x, pos.y);
             }
         });
@@ -570,26 +549,23 @@
             if (currentMode === 'pan') {
                 offsetX += touch.clientX - lastX;
                 offsetY += touch.clientY - lastY;
-                render();
+                scheduleRender();
             } else if (currentMode === 'draw') {
-                const pos = getCanvasCoords(e);
+                const pos = getCanvasCoords(touch.clientX, touch.clientY);
                 placePixel(pos.x, pos.y);
             }
-            lastX = touch.clientX;
-            lastY = touch.clientY;
+            lastX = touch.clientX; lastY = touch.clientY;
         }, { passive: false });
 
         viewport.addEventListener('touchend', () => { isMouseDown = false; });
 
-        // 縮放功能
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoom = e.deltaY < 0 ? 1.15 : 0.85;
             scale = Math.max(0.1, Math.min(scale * zoom, 20));
-            render();
+            scheduleRender();
         }, { passive: false });
 
-        // 調色盤選擇
         document.getElementById('palette').addEventListener('click', (e) => {
             if (e.target.classList.contains('color-btn')) {
                 document.querySelectorAll('.color-btn, .color-custom-label').forEach(b => b.classList.remove('active'));
