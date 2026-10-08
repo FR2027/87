@@ -168,7 +168,7 @@
             padding: 16px;
             border-radius: 16px;
             z-index: 30;
-            width: 200px;
+            width: 210px;
             box-shadow: var(--glass-shadow);
             font-size: 12px;
         }
@@ -237,10 +237,14 @@
     </div>
 
     <div id="stamp-panel">
-        <h3>印章設置</h3>
+        <h3>印章尺寸與放置</h3>
         <div class="control-group">
-            <label>寬度: <span id="stamp-w-val">40</span> px</label>
-            <input type="range" id="stamp-width" min="10" max="100" value="40">
+            <label>圖片寬度: <span id="stamp-w-val">50</span> px</label>
+            <input type="range" id="stamp-width" min="5" max="300" value="50">
+        </div>
+        <div class="control-group">
+            <label>圖片高度: <span id="stamp-h-val">50</span> px</label>
+            <input type="range" id="stamp-height" min="5" max="300" value="50">
         </div>
         <button class="stamp-action-btn" onclick="applyStamp()">直接蓋章下去！</button>
         <button class="stamp-cancel-btn" onclick="cancelStamp()">取消圖片</button>
@@ -327,9 +331,8 @@
         let pendingWrites = {};
 
         let stampImage = null;
-        let stampX = 200, stampY = 200, stampW = 40, stampH = 40;
+        let stampX = 150, stampY = 150, stampW = 50, stampH = 50;
 
-        // requestAnimationFrame 渲染優化
         let renderScheduled = false;
         function scheduleRender() {
             if (!renderScheduled) {
@@ -373,7 +376,6 @@
             }
         }
 
-        // 載入 Firebase 數據 (限流處理)
         pixelsRef.once('value', snap => {
             const data = snap.val();
             if (data) {
@@ -392,7 +394,6 @@
             scheduleRender();
         });
 
-        // 塗鴉寫入緩衝區 (100ms 批次上傳一次，解決卡頓)
         setInterval(() => {
             if (Object.keys(pendingWrites).length > 0) {
                 db.ref().update(pendingWrites);
@@ -436,10 +437,16 @@
                 const img = new Image();
                 img.onload = () => {
                     stampImage = img;
-                    stampW = Math.min(60, img.width);
-                    stampH = Math.round(stampW * (img.height / img.width));
+                    // 自動按原圖比例計算寬高
+                    const aspect = img.height / img.width;
+                    stampW = Math.min(100, img.width);
+                    stampH = Math.round(stampW * aspect);
+
                     document.getElementById('stamp-width').value = stampW;
+                    document.getElementById('stamp-height').value = stampH;
                     document.getElementById('stamp-w-val').innerText = stampW;
+                    document.getElementById('stamp-h-val').innerText = stampH;
+                    
                     document.getElementById('stamp-panel').style.display = 'block';
                     switchMode('stamp');
                 };
@@ -451,28 +458,44 @@
         document.getElementById('stamp-width').addEventListener('input', (e) => {
             stampW = parseInt(e.target.value);
             document.getElementById('stamp-w-val').innerText = stampW;
-            if (stampImage) stampH = Math.round(stampW * (stampImage.height / stampImage.width));
             renderPreview();
         });
 
+        document.getElementById('stamp-height').addEventListener('input', (e) => {
+            stampH = parseInt(e.target.value);
+            document.getElementById('stamp-h-val').innerText = stampH;
+            renderPreview();
+        });
+
+        // 核心修復：100% 完整採樣與繪製 stamp 圖片
         function applyStamp() {
             if (!stampImage) return;
+
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = stampW;
             tempCanvas.height = stampH;
             const tCtx = tempCanvas.getContext('2d');
+            
+            // 繪製原圖至臨時畫布
             tCtx.drawImage(stampImage, 0, 0, stampW, stampH);
-
             const imgData = tCtx.getImageData(0, 0, stampW, stampH).data;
             const todayStr = new Date().toISOString().split('T')[0];
 
             for (let y = 0; y < stampH; y++) {
                 for (let x = 0; x < stampW; x++) {
                     const idx = (y * stampW + x) * 4;
-                    if (imgData[idx + 3] > 50) { 
-                        const hex = "#" + ((1 << 24) + (imgData[idx] << 16) + (imgData[idx + 1] << 8) + imgData[idx + 2]).toString(16).slice(1);
+                    const alpha = imgData[idx + 3];
+
+                    // 只要非完全透明即蓋章印下
+                    if (alpha > 5) { 
+                        const r = imgData[idx];
+                        const g = imgData[idx + 1];
+                        const b = imgData[idx + 2];
+                        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                        
                         const targetX = stampX + x;
                         const targetY = stampY + y;
+
                         if (targetX >= 0 && targetX < MAP_SIZE && targetY >= 0 && targetY < MAP_SIZE) {
                             localMap[`${targetX},${targetY}`] = hex;
                             pendingWrites[`/pixels/x${targetX}_y${targetY}`] = {
@@ -485,6 +508,7 @@
                     }
                 }
             }
+
             cancelStamp();
             scheduleRender();
         }
@@ -540,6 +564,7 @@
                 lastY = e.touches[0].clientY;
                 const pos = getCanvasCoords(lastX, lastY);
                 if (currentMode === 'draw') placePixel(pos.x, pos.y);
+                else if (currentMode === 'stamp') { stampX = pos.x; stampY = pos.y; renderPreview(); }
             }
         });
 
@@ -553,6 +578,9 @@
             } else if (currentMode === 'draw') {
                 const pos = getCanvasCoords(touch.clientX, touch.clientY);
                 placePixel(pos.x, pos.y);
+            } else if (currentMode === 'stamp') {
+                const pos = getCanvasCoords(touch.clientX, touch.clientY);
+                stampX = pos.x; stampY = pos.y; renderPreview();
             }
             lastX = touch.clientX; lastY = touch.clientY;
         }, { passive: false });
