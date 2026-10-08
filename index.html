@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>FRX Pixel Wars | 像素大戰</title>
-    <meta name="description" content="歡迎來到FRX Pixel Wars 全球官方像素大戰！與來自世界各地的玩家一同在 500x500 的巨型畫布上即時創作、放置像素，發揮創意與團隊合作守護你的像素領地！">
-    <meta name="keywords" content="Pixel Wars, 像素大戰, 線上畫布, 即時多人像素, Pixel Art, FRX">
+    <title>FRX Pixel Wars | 自由創作模式</title>
+    <meta name="description" content="FRX Pixel Wars 自由創作模式：完全無冷卻、支援圖片蓋章與自由筆刷塗鴉！">
     
     <link rel="icon" href="https://i.ibb.co/G4FNMK2M/photo-output.webp" type="image/webp">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/G4FNMK2M/photo-output.webp">
-    <meta name="google-site-verification" content="D2jjOhjMZmOG8zwCgpx7-W__kj6AS2vNOUrsyrp8OGA" />
     <style>
         :root {
-            --glass-bg: rgba(15, 15, 20, 0.65);
+            --glass-bg: rgba(15, 15, 20, 0.75);
             --glass-border: rgba(255, 255, 255, 0.18);
             --glass-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.65);
             --blur-strength: 32px;
@@ -32,125 +29,6 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        
-        #loader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at center, #12121a 0%, #070709 100%);
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 260px;
-        }
-
-        .loader-ring {
-            position: relative;
-            width: 76px;
-            height: 76px;
-            margin-bottom: 28px;
-        }
-
-        .loader-ring div {
-            box-sizing: border-box;
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            margin: 6px;
-            border: 4px solid transparent;
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: ring-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        }
-
-        .loader-ring div:nth-child(1) { animation-delay: -0.45s; border-top-color: #3b82f6; }
-        .loader-ring div:nth-child(2) { animation-delay: -0.3s; border-top-color: #8b5cf6; }
-        .loader-ring div:nth-child(3) { animation-delay: -0.15s; border-top-color: #ec4899; }
-
-        @keyframes ring-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loader-progress-track {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
-            margin-bottom: 16px;
-        }
-
-        .loader-progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
-        }
-
-        .loader-text {
-            font-size: 13px;
-            letter-spacing: 2px;
-            color: #a1a1aa;
-            font-weight: 500;
-        }
-
-        #ui-stats {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
-            -webkit-backdrop-filter: blur(var(--blur-strength));
-            padding: 10px 14px;
-            border-radius: 16px;
-            box-shadow: var(--glass-shadow);
-            z-index: 20;
-            font-size: 11px;
-            line-height: 1.5;
-            border: 1px solid var(--glass-border);
-            pointer-events: auto;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .dot-online {
-            width: 7px;
-            height: 7px;
-            background-color: #22c55e;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px #22c55e;
-        }
-
-        .dot-views {
-            width: 7px;
-            height: 7px;
-            background-color: #3b82f6;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px #3b82f6;
-        }
 
         #ui-top {
             position: absolute;
@@ -159,20 +37,18 @@
             transform: translateX(-50%);
             text-align: center;
             z-index: 10;
-            pointer-events: none;
-            width: calc(100% - 170px);
-            max-width: 280px;
+            pointer-events: auto;
+            padding: 8px 16px;
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-strength));
             -webkit-backdrop-filter: blur(var(--blur-strength));
-            padding: 8px 12px;
             border-radius: 18px;
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
         }
 
-        h1 { margin: 0; font-size: 13px; letter-spacing: 1px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        p { margin: 2px 0 0 0; font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        h1 { margin: 0; font-size: 14px; letter-spacing: 1px; font-weight: 700; color: #ffffff; }
+        p { margin: 2px 0 0 0; font-size: 11px; color: #10b981; font-weight: 600; }
 
         #viewport {
             width: 100vw;
@@ -180,20 +56,15 @@
             position: absolute;
             top: 0;
             left: 0;
-            cursor: grab;
+            cursor: crosshair;
         }
-        #viewport:active { cursor: grabbing; }
 
         #canvas-wrapper {
             position: absolute;
             box-shadow: 0 30px 80px rgba(0,0,0,0.9);
             background-color: white;
-            background-image: 
-                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
-            background-size: 10px 10px;
             transform-origin: 0 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         canvas {
@@ -204,16 +75,46 @@
             image-rendering: crisp-edges;
         }
 
+        /* 底部控制列 */
         #ui-bottom {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10;
+            z-index: 20;
             width: 94%;
-            max-width: 480px;
+            max-width: 600px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tool-bar {
+            display: flex;
+            gap: 8px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid transparent;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tool-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .tool-btn.active {
+            background: var(--primary-accent);
+            border-color: #60a5fa;
+            font-weight: bold;
         }
 
         .palette {
@@ -221,7 +122,6 @@
             gap: 8px;
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-strength));
-            -webkit-backdrop-filter: blur(var(--blur-strength));
             padding: 10px 16px;
             border-radius: 35px;
             box-shadow: var(--glass-shadow);
@@ -234,44 +134,81 @@
         .palette::-webkit-scrollbar { display: none; }
 
         .color-btn {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.15);
             cursor: pointer;
             box-sizing: border-box;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
         .color-btn.active {
             border-color: #ffffff;
-            transform: scale(1.18);
-            box-shadow: 0 0 16px rgba(255,255,255,0.7);
+            transform: scale(1.2);
+            box-shadow: 0 0 12px rgba(255,255,255,0.8);
         }
         
         .color-custom-label {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.15);
             cursor: pointer;
             background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff, #ff00ff, #ff0000);
-            box-sizing: border-box;
             display: block;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s;
         }
-        .color-custom-label.active {
-            border-color: #ffffff;
-            transform: scale(1.18);
-            box-shadow: 0 0 16px rgba(255,255,255,0.7);
-        }
-        #custom-color-picker {
+        #custom-color-picker { display: none; }
+
+        /* 圖片印章調控面板 */
+        #stamp-panel {
+            display: none;
             position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-            pointer-events: none;
+            top: 70px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength));
+            border: 1px solid var(--glass-border);
+            padding: 16px;
+            border-radius: 16px;
+            z-index: 30;
+            width: 220px;
+            box-shadow: var(--glass-shadow);
+            font-size: 12px;
+        }
+        #stamp-panel h3 { margin: 0 0 10px 0; font-size: 14px; color: #fff; }
+        .control-group { margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .control-group label { color: #94a3b8; }
+        .control-group input[type="range"], .control-group input[type="number"] {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .stamp-action-btn {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: #22c55e;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .stamp-action-btn:hover { background: #16a34a; }
+        .stamp-cancel-btn {
+            width: 100%;
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: #ef4444;
+            cursor: pointer;
+            margin-top: 4px;
         }
 
         .floating-buttons {
@@ -279,259 +216,89 @@
             top: 15px;
             right: 15px;
             display: flex;
-            flex-direction: row;
             gap: 8px;
             z-index: 20;
         }
 
         .float-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-strength));
-            -webkit-backdrop-filter: blur(var(--blur-strength));
             box-shadow: var(--glass-shadow);
             border: 1px solid var(--glass-border);
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-decoration: none;
-        }
-        .float-btn:hover {
-            transform: scale(1.12);
-        }
-
-        #discord-btn img {
-            width: 22px;
-            height: 22px;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-
-        #youtube-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-
-        #captcha-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(7, 7, 9, 0.85);
-            backdrop-filter: blur(35px);
-            -webkit-backdrop-filter: blur(35px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-        .captcha-box {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength));
-            -webkit-backdrop-filter: blur(var(--blur-strength));
-            border: 1px solid var(--glass-border);
-            padding: 24px;
-            border-radius: 24px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-            text-align: center;
-            width: 85%;
-            max-width: 320px;
-        }
-        .captcha-box h2 {
-            margin-top: 0;
-            font-size: 17px;
-            color: #ffffff;
-            margin-bottom: 6px;
-        }
-        .captcha-box p {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-bottom: 18px;
-        }
-        .captcha-game-area {
-            position: relative;
-            width: 100%;
-            height: 120px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 12px;
-            overflow: hidden;
-            cursor: crosshair;
-        }
-        .target-dot {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 16px #22c55e;
             cursor: pointer;
-        }
-        .captcha-error {
-            color: #ef4444;
-            font-size: 11px;
-            margin-top: 6px;
-            display: none;
         }
     </style>
 
-    <!-- SDK (Compat 核心與服務) -->
+    <!-- SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-    <!-- 載入中遮罩畫面 -->
-    <div id="loader-overlay">
-        <div class="loader-container">
-            <div class="loader-ring">
-                <div></div><div></div><div></div>
-            </div>
-            <div class="loader-progress-track">
-                <div class="loader-progress-bar" id="loader-bar"></div>
-            </div>
-            <div class="loader-text" id="loader-text-status">正在載入伺服器...</div>
-        </div>
-    </div>
-
-    <!-- 驗證碼遮罩畫面 -->
-    <div id="captcha-overlay" style="display:none;">
-        <div class="captcha-box">
-            <h2>安全驗證</h2>
-            <p>請點擊綠色圓點以證明您不是機器人或是自動化程式[span_1](start_span)[span_1](end_span)</p>
-            <div class="captcha-game-area" id="captcha-area"></div>
-            <div class="captcha-error" id="captcha-error">請點擊綠色圓點[span_2](start_span)[span_2](end_span)</div>
-        </div>
-    </div>
-
-    <div id="ui-stats">
-        <div class="stat-item"><span class="dot-online"></span> 在線人數：<span id="online-count">0</span> 人</div>
-        <div class="stat-item"><span class="dot-views"></span> 瀏覽次數：<span id="view-count">0</span> 次</div>
-    </div>
-
     <div id="ui-top">
         <h1>FRX Pixel Wars</h1>
-        <p id="status">點擊畫布放置像素！</p>
+        <p>⚡ 自由模式：無冷卻 / 畫筆 / 圖片蓋章</p>
     </div>
 
     <div class="floating-buttons">
-        <a href="https://www.youtube.com/@frx2027" target="_blank" id="youtube-btn" class="float-btn" title="官方 YouTube">
-            <svg viewBox="0 0 24 24">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-        </a>
-        <a href="https://frx-tau.vercel.app/" target="_blank" id="discord-btn" class="float-btn" title="官方網站">
-            <img src="https://i.ibb.co/0jDBgxVc/FRX.png" alt="Logo">
-        </a>
+        <button class="float-btn" onclick="centerCanvas()" title="重置視角">🎯</button>
+    </div>
+
+    <!-- 圖片印章控制面板 -->
+    <div id="stamp-panel">
+        <h3>印章設置</h3>
+        <div class="control-group">
+            <label>寬度 (像素): <span id="stamp-w-val">50</span></label>
+            <input type="range" id="stamp-width" min="10" max="200" value="50">
+        </div>
+        <div class="control-group">
+            <label>位置 X: <input type="number" id="stamp-x" value="0"></label>
+            <label>位置 Y: <input type="number" id="stamp-y" value="0"></label>
+        </div>
+        <button class="stamp-action-btn" onclick="applyStamp()">直接蓋章下去！</button>
+        <button class="stamp-cancel-btn" onclick="cancelStamp()">取消圖片</button>
     </div>
 
     <div id="viewport">
         <div id="canvas-wrapper">
             <canvas id="pixelCanvas"></canvas>
+            <canvas id="previewCanvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
         </div>
     </div>
 
     <div id="ui-bottom">
+        <div class="tool-bar">
+            <button class="tool-btn active" id="mode-draw" onclick="switchMode('draw')">✏️ 單點/塗鴉</button>
+            <button class="tool-btn" id="mode-pan" onclick="switchMode('pan')">✋ 拖動視角</button>
+            <button class="tool-btn" onclick="document.getElementById('image-uploader').click()">🖼️ 上傳圖片蓋章</button>
+            <input type="file" id="image-uploader" accept="image/*" style="display:none;">
+        </div>
+
         <div class="palette" id="palette">
-            <div class="color-btn active" style="background-color: #000000;" data-color="#000000" title="純黑"></div>
-            <div class="color-btn" style="background-color: #ffffff;" data-color="#ffffff" title="純白"></div>
-            <div class="color-btn" style="background-color: #ff0000;" data-color="#ff0000" title="紅"></div>
-            <div class="color-btn" style="background-color: #00ff00;" data-color="#00ff00" title="綠"></div>
-            <div class="color-btn" style="background-color: #0055ff;" data-color="#0055ff" title="藍"></div>
-            <div class="color-btn" style="background-color: #ffff00;" data-color="#ffff00" title="黃"></div>
-            <div class="color-btn" style="background-color: #ff00ff;" data-color="#ff00ff" title="洋紅"></div>
-            <div class="color-btn" style="background-color: #00ffff;" data-color="#00ffff" title="青"></div>
-            <div class="color-btn" style="background-color: #ff7700;" data-color="#ff7700" title="橘"></div>
-            <div class="color-btn" style="background-color: #8b00ff;" data-color="#8b00ff" title="紫"></div>
+            <div class="color-btn active" style="background-color: #000000;" data-color="#000000"></div>
+            <div class="color-btn" style="background-color: #ffffff;" data-color="#ffffff"></div>
+            <div class="color-btn" style="background-color: #ff0000;" data-color="#ff0000"></div>
+            <div class="color-btn" style="background-color: #00ff00;" data-color="#00ff00"></div>
+            <div class="color-btn" style="background-color: #0055ff;" data-color="#0055ff"></div>
+            <div class="color-btn" style="background-color: #ffff00;" data-color="#ffff00"></div>
+            <div class="color-btn" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+            <div class="color-btn" style="background-color: #00ffff;" data-color="#00ffff"></div>
+            <div class="color-btn" style="background-color: #ff7700;" data-color="#ff7700"></div>
+            <div class="color-btn" style="background-color: #8b00ff;" data-color="#8b00ff"></div>
             
-            <label class="color-custom-label" id="custom-color-label" for="custom-color-picker" title="自訂顏色"></label>
+            <label class="color-custom-label" id="custom-color-label" for="custom-color-picker"></label>
             <input type="color" id="custom-color-picker" value="#ff0000">
         </div>
     </div>
 
     <script>
-        // 禁絕右鍵與開發者工具快捷鍵 (防作弊)
-        (function() {
-            window.addEventListener('contextmenu', e => e.preventDefault());
-            window.addEventListener('keydown', e => {
-                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','i','J','j','C','c'].includes(e.key)) || (e.ctrlKey && e.key === 'U')) {
-                    e.preventDefault();
-                }
-            });
-        })();
-
-        // 載入進度條動畫
-        let loadProgress = 0;
-        const progressBar = document.getElementById('loader-bar');
-        const progressText = document.getElementById('loader-text-status');
-        
-        const progressInterval = setInterval(() => {
-            if (loadProgress < 95) {
-                loadProgress += Math.random() * 1.5 + 0.5;
-                if (loadProgress > 95) loadProgress = 95;
-                if (progressBar) progressBar.style.width = loadProgress + '%';
-                if (progressText) progressText.innerText = `正在載入伺服器與地圖資源 (${Math.floor(loadProgress)}%)`;
-            }
-        }, 200);
-
-        // 驗證碼邏輯
-        function spawnCaptchaDot() {
-            const area = document.getElementById('captcha-area');
-            if (!area) return;
-            area.innerHTML = '';
-            const dot = document.createElement('div');
-            dot.className = 'target-dot';
-            const maxX = area.clientWidth - 35;
-            const maxY = area.clientHeight - 35;
-            const rx = Math.floor(Math.random() * Math.max(10, maxX));
-            const ry = Math.floor(Math.random() * Math.max(10, maxY));
-            dot.style.left = rx + 'px';
-            dot.style.top = ry + 'px';
-            dot.onclick = (e) => {
-                e.stopPropagation();
-                passCaptcha();
-            };
-            area.onclick = () => {
-                const err = document.getElementById('captcha-error');
-                if (err) err.style.display = 'block';
-                spawnCaptchaDot();
-            };
-            area.appendChild(dot);
-        }
-
-        function checkCaptchaSession() {
-            const lastVerified = localStorage.getItem('frx_captcha_time');
-            const now = Date.now();
-            const captchaOverlay = document.getElementById('captcha-overlay');
-            if (lastVerified && (now - parseInt(lastVerified, 10) < 30 * 60 * 1000)) {
-                if (captchaOverlay) captchaOverlay.style.display = 'none';
-            } else {
-                if (captchaOverlay) captchaOverlay.style.display = 'flex';
-                setTimeout(spawnCaptchaDot, 100);
-            }
-        }
-
-        function passCaptcha() {
-            localStorage.setItem('frx_captcha_time', Date.now());
-            const overlay = document.getElementById('captcha-overlay');
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(() => { overlay.style.display = 'none'; }, 300);
-            }
-        }
-        
-        checkCaptchaSession();
-
-        // Firebase 設置
         const firebaseConfig = {
             apiKey: "AIzaSyCTZb5Fphxpr_54XBWbrIzyW5uspJzhwak",
             authDomain: "frx67-2a892.firebaseapp.com",
@@ -549,52 +316,15 @@
         const pixelsRef = db.ref('pixels');
 
         let currentUser = null;
-        let sessionConnectedRef = null;
-
-        auth.signInAnonymously().then(() => {
-            console.log("登入成功！");
-        }).catch((error) => {
-            console.error("登入失敗：", error);
-        });
-
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                currentUser = user;
-                const sessionId = '_' + Math.random().toString(36).substr(2, 9);
-                sessionConnectedRef = db.ref(`stats/connections/${user.uid}${sessionId}`);
-
-                db.ref('.info/connected').on('value', (snapshot) => {
-                    if (snapshot.val() === true) {
-                        sessionConnectedRef.onDisconnect().remove();
-                        sessionConnectedRef.set(true);
-                    }
-                });
-            } else {
-                currentUser = null;
-            }
-        });
-
-        const onlineCountEl = document.getElementById('online-count');
-        const viewCountEl = document.getElementById('view-count');
-
-        db.ref('stats/totalViews').on('value', (snap) => {
-            if(snap.exists() && viewCountEl) viewCountEl.innerText = snap.val();
-        });
-        db.ref('stats/totalViews').transaction((current) => (current || 0) + 1);
-
-        const connectionsRef = db.ref('stats/connections');
-        connectionsRef.on('value', (snap) => {
-            if (onlineCountEl) onlineCountEl.innerText = snap.numChildren();
-        });
+        auth.signInAnonymously().then().catch(console.error);
+        auth.onAuthStateChanged(user => { currentUser = user; });
 
         const viewport = document.getElementById('viewport');
         const wrapper = document.getElementById('canvas-wrapper');
         const canvas = document.getElementById('pixelCanvas');
         const ctx = canvas.getContext('2d');
-        const palette = document.getElementById('palette');
-        
-        const customColorPicker = document.getElementById('custom-color-picker');
-        const customColorLabel = document.getElementById('custom-color-label');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const pCtx = previewCanvas.getContext('2d');
 
         const MAP_SIZE = 500; 
         const CELL_SIZE = 10;
@@ -603,54 +333,26 @@
         wrapper.style.height = (MAP_SIZE * CELL_SIZE) + 'px';
         canvas.width = MAP_SIZE;
         canvas.height = MAP_SIZE;
+        previewCanvas.width = MAP_SIZE;
+        previewCanvas.height = MAP_SIZE;
         ctx.imageSmoothingEnabled = false;
+        pCtx.imageSmoothingEnabled = false;
 
-        let scale = 1;         
-        let offsetX = 0;       
-        let offsetY = 0;       
-        let isDragging = false;
-        let startX, startY;
-        let touchStartDist = 0; 
-        let startScale = 1;
-        let isPanning = false;  
+        let scale = 1, offsetX = 0, offsetY = 0;
+        let isMouseDown = false;
         let selectedColor = '#000000';
-        let isPlacingPixel = false; // 執行鎖
-
+        let currentMode = 'draw'; // 'draw' | 'pan' | 'stamp'
         const localMap = {}; 
-        let isLoadedFirstTime = false;
-        
-        let renderRequested = false;
-        function requestRender() {
-            if (!renderRequested) {
-                renderRequested = true;
-                requestAnimationFrame(() => {
-                    renderRequested = false;
-                    render();
-                });
-            }
-        }
 
-        function hideLoader() {
-            if (!isLoadedFirstTime) {
-                isLoadedFirstTime = true;
-                clearInterval(progressInterval);
-                if (progressBar) progressBar.style.width = '100%';
-                if (progressText) progressText.innerText = "載入完成！";
-                setTimeout(() => {
-                    const loader = document.getElementById('loader-overlay');
-                    if (loader) {
-                        loader.style.opacity = '0';
-                        setTimeout(() => { loader.style.display = 'none'; }, 800);
-                    }
-                }, 400);
-            }
-        }
+        // 印章相關 State
+        let stampImage = null;
+        let stampX = 100, stampY = 100, stampW = 50, stampH = 50;
 
         function centerCanvas() {
             scale = Math.min(window.innerWidth, window.innerHeight) / (MAP_SIZE * CELL_SIZE) * 0.9;
             offsetX = (window.innerWidth - (MAP_SIZE * CELL_SIZE) * scale) / 2;
             offsetY = (window.innerHeight - (MAP_SIZE * CELL_SIZE) * scale) / 2;
-            requestRender();
+            render();
         }
 
         function render() {
@@ -660,198 +362,247 @@
                 ctx.fillStyle = localMap[key];
                 ctx.fillRect(x, y, 1, 1);
             }
-            if (scale > 0.8) {
-                wrapper.style.backgroundImage = `
-                    linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px)
-                `;
-            } else {
-                wrapper.style.backgroundImage = `
-                    linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)
-                `;
-            }
             wrapper.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-            hideLoader();
+            renderPreview();
         }
 
-        pixelsRef.on('child_added', (snapshot) => {
-            const key = snapshot.key;
-            const data = snapshot.val();
-            const cleanKey = key.replace('x', '').replace('y', '').replace('_', ',');
-            localMap[cleanKey] = data.color;
-            requestRender();
-        });
-
-        pixelsRef.on('child_changed', (snapshot) => {
-            const key = snapshot.key;
-            const data = snapshot.val();
-            const cleanKey = key.replace('x', '').replace('y', '').replace('_', ',');
-            localMap[cleanKey] = data.color;
-            requestRender();
-        });
-
-        pixelsRef.on('child_removed', (snapshot) => {
-            const key = snapshot.key;
-            const cleanKey = key.replace('x', '').replace('y', '').replace('_', ',');
-            delete localMap[cleanKey];
-            requestRender();
-        });
-
-        function tryPlacePixel(clickX, clickY) {
-            if (isPlacingPixel) return;
-            if (!currentUser) {
-                alert("正在建立安全連線，請稍後再試！");
-                return;
+        function renderPreview() {
+            pCtx.clearRect(0, 0, MAP_SIZE, MAP_SIZE);
+            if (currentMode === 'stamp' && stampImage) {
+                pCtx.globalAlpha = 0.7;
+                pCtx.drawImage(stampImage, stampX, stampY, stampW, stampH);
+                pCtx.strokeStyle = '#3b82f6';
+                pCtx.lineWidth = 1;
+                pCtx.strokeRect(stampX, stampY, stampW, stampH);
             }
-            if (clickX >= 0 && clickX < MAP_SIZE && clickY >= 0 && clickY < MAP_SIZE) {
-                isPlacingPixel = true;
-                const dbKey = `x${clickX}_y${clickY}`;
-                
-                const updates = {};
-                updates[`/pixels/${dbKey}`] = {
-                    color: selectedColor,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    uid: currentUser.uid
+        }
+
+        // Firebase 監聽
+        pixelsRef.on('child_added', snap => {
+            const cleanKey = snap.key.replace('x', '').replace('y', '').replace('_', ',');
+            localMap[cleanKey] = snap.val().color;
+            render();
+        });
+        pixelsRef.on('child_changed', snap => {
+            const cleanKey = snap.key.replace('x', '').replace('y', '').replace('_', ',');
+            localMap[cleanKey] = snap.val().color;
+            render();
+        });
+
+        // 完全無冷卻寫入
+        function placePixel(x, y) {
+            if (x < 0 || x >= MAP_SIZE || y < 0 || y >= MAP_SIZE) return;
+            const dbKey = `x${x}_y${y}`;
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            // 本地快速預覽
+            localMap[`${x},${y}`] = selectedColor;
+            render();
+
+            pixelsRef.child(dbKey).set({
+                color: selectedColor,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                uid: currentUser ? currentUser.uid : 'anon',
+                date: todayStr
+            });
+        }
+
+        // 切換模式
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            if(mode === 'draw') document.getElementById('mode-draw').classList.add('active');
+            if(mode === 'pan') document.getElementById('mode-pan').classList.add('active');
+            if(mode !== 'stamp') document.getElementById('stamp-panel').style.display = 'none';
+            renderPreview();
+        }
+
+        // 上傳與處理印章
+        document.getElementById('image-uploader').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    stampImage = img;
+                    stampW = Math.min(100, img.width);
+                    stampH = Math.round(stampW * (img.height / img.width));
+                    document.getElementById('stamp-width').value = stampW;
+                    document.getElementById('stamp-w-val').innerText = stampW;
+                    document.getElementById('stamp-x').value = stampX;
+                    document.getElementById('stamp-y').value = stampY;
+                    document.getElementById('stamp-panel').style.display = 'block';
+                    switchMode('stamp');
                 };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
 
-                db.ref().update(updates).then(() => {
-                    isPlacingPixel = false;
-                }).catch((error) => {
-                    console.error("寫入被拒絕或發生錯誤：", error);
-                    isPlacingPixel = false;
-                });
+        document.getElementById('stamp-width').addEventListener('input', (e) => {
+            stampW = parseInt(e.target.value);
+            document.getElementById('stamp-w-val').innerText = stampW;
+            if (stampImage) stampH = Math.round(stampW * (stampImage.height / stampImage.width));
+            renderPreview();
+        });
+
+        document.getElementById('stamp-x').addEventListener('input', (e) => { stampX = parseInt(e.target.value) || 0; renderPreview(); });
+        document.getElementById('stamp-y').addEventListener('input', (e) => { stampY = parseInt(e.target.value) || 0; renderPreview(); });
+
+        // 蓋章印下圖片（轉換為像素）
+        function applyStamp() {
+            if (!stampImage) return;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = stampW;
+            tempCanvas.height = stampH;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.drawImage(stampImage, 0, 0, stampW, stampH);
+
+            const imgData = tCtx.getImageData(0, 0, stampW, stampH).data;
+            const updates = {};
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            for (let y = 0; y < stampH; y++) {
+                for (let x = 0; x < stampW; x++) {
+                    const idx = (y * stampW + x) * 4;
+                    const a = imgData[idx + 3];
+                    if (a > 50) { // 透明度過濾
+                        const r = imgData[idx];
+                        const g = imgData[idx + 1];
+                        const b = imgData[idx + 2];
+                        const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+
+                        const targetX = stampX + x;
+                        const targetY = stampY + y;
+                        if (targetX >= 0 && targetX < MAP_SIZE && targetY >= 0 && targetY < MAP_SIZE) {
+                            localMap[`${targetX},${targetY}`] = hex;
+                            updates[`/pixels/x${targetX}_y${targetY}`] = {
+                                color: hex,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                uid: currentUser ? currentUser.uid : 'anon',
+                                date: todayStr
+                            };
+                        }
+                    }
+                }
             }
+            db.ref().update(updates);
+            cancelStamp();
+            render();
+        }
+
+        function cancelStamp() {
+            stampImage = null;
+            document.getElementById('stamp-panel').style.display = 'none';
+            switchMode('draw');
+        }
+
+        // 滑鼠/觸控互動邏輯
+        let lastX = 0, lastY = 0;
+
+        function getCanvasCoords(e) {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: Math.floor((clientX - offsetX) / (scale * CELL_SIZE)),
+                y: Math.floor((clientY - offsetY) / (scale * CELL_SIZE))
+            };
         }
 
         viewport.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.palette') || e.target.closest('.floating-buttons') || document.getElementById('captcha-overlay').style.display !== 'none') return;
-            isDragging = true;
-            isPanning = false;
-            startX = e.clientX - offsetX;
-            startY = e.clientY - offsetY;
-        });
+            if (e.target.closest('#ui-bottom') || e.target.closest('#stamp-panel')) return;
+            isMouseDown = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
 
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            isPanning = true;
-            offsetX = e.clientX - startX;
-            offsetY = e.clientY - startY;
-            requestRender();
-        });
-
-        window.addEventListener('mouseup', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            if (!isPanning && !e.target.closest('.palette') && !e.target.closest('.floating-buttons') && document.getElementById('captcha-overlay').style.display === 'none') {
-                const clickX = Math.floor((e.clientX - offsetX) / (scale * CELL_SIZE));
-                const clickY = Math.floor((e.clientY - offsetY) / (scale * CELL_SIZE));
-                tryPlacePixel(clickX, clickY);
+            const pos = getCanvasCoords(e);
+            if (currentMode === 'draw') {
+                placePixel(pos.x, pos.y);
+            } else if (currentMode === 'stamp') {
+                stampX = pos.x;
+                stampY = pos.y;
+                document.getElementById('stamp-x').value = stampX;
+                document.getElementById('stamp-y').value = stampY;
+                renderPreview();
             }
         });
 
-        viewport.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const zoomFactor = 1.15;
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-            const canvasX = (mouseX - offsetX) / scale;
-            const canvasY = (mouseY - offsetY) / scale;
+        window.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            if (currentMode === 'pan') {
+                offsetX += e.clientX - lastX;
+                offsetY += e.clientY - lastY;
+                render();
+            } else if (currentMode === 'draw') {
+                const pos = getCanvasCoords(e);
+                placePixel(pos.x, pos.y); // 比刷畫布塗鴉
+            } else if (currentMode === 'stamp') {
+                const pos = getCanvasCoords(e);
+                stampX = pos.x;
+                stampY = pos.y;
+                document.getElementById('stamp-x').value = stampX;
+                document.getElementById('stamp-y').value = stampY;
+                renderPreview();
+            }
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
 
-            if (e.deltaY < 0) scale *= zoomFactor;
-            else scale /= zoomFactor;
-            scale = Math.max(0.05, Math.min(scale, 25));
+        window.addEventListener('mouseup', () => { isMouseDown = false; });
 
-            offsetX = mouseX - canvasX * scale;
-            offsetY = mouseY - canvasY * scale;
-            requestRender();
-        }, { passive: false });
-
+        // 觸控事件支援 (筆刷塗鴉與移動)
         viewport.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.palette') || e.target.closest('.floating-buttons') || document.getElementById('captcha-overlay').style.display !== 'none') return;
+            if (e.target.closest('#ui-bottom') || e.target.closest('#stamp-panel')) return;
             if (e.touches.length === 1) {
-                isDragging = true;
-                isPanning = false;
-                startX = e.touches[0].clientX - offsetX;
-                startY = e.touches[0].clientY - offsetY;
-            } else if (e.touches.length === 2) {
-                isDragging = false; 
-                startScale = scale;
-                touchStartDist = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
+                isMouseDown = true;
+                lastX = e.touches[0].clientX;
+                lastY = e.touches[0].clientY;
+                const pos = getCanvasCoords(e);
+                if (currentMode === 'draw') placePixel(pos.x, pos.y);
             }
         });
 
         viewport.addEventListener('touchmove', (e) => {
-            if (e.target.closest('.palette') || e.target.closest('.floating-buttons')) return;
-            e.preventDefault();
-            if (e.touches.length === 1 && isDragging) {
-                isPanning = true;
-                offsetX = e.touches[0].clientX - startX;
-                offsetY = e.touches[0].clientY - startY;
-                requestRender();
-            } else if (e.touches.length === 2) {
-                const dist = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-                const factor = dist / touchStartDist;
-                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                const canvasX = (midX - offsetX) / scale;
-                const canvasY = (midY - offsetY) / scale;
-
-                scale = Math.max(0.05, Math.min(startScale * factor, 25));
-                offsetX = midX - canvasX * scale;
-                offsetY = midY - canvasY * scale;
-                requestRender();
+            if (!isMouseDown || e.touches.length > 1) return;
+            const touch = e.touches[0];
+            if (currentMode === 'pan') {
+                offsetX += touch.clientX - lastX;
+                offsetY += touch.clientY - lastY;
+                render();
+            } else if (currentMode === 'draw') {
+                const pos = getCanvasCoords(e);
+                placePixel(pos.x, pos.y);
             }
+            lastX = touch.clientX;
+            lastY = touch.clientY;
         }, { passive: false });
 
-        viewport.addEventListener('touchend', (e) => {
-            if (e.touches.length > 0) {
-                isDragging = false;
-                return;
-            }
-            if (isDragging && !isPanning && e.changedTouches.length === 1) {
-                const touch = e.changedTouches[0];
-                if (!e.target.closest('.palette') && !e.target.closest('.floating-buttons') && document.getElementById('captcha-overlay').style.display === 'none') {
-                    const clickX = Math.floor((touch.clientX - offsetX) / (scale * CELL_SIZE));
-                    const clickY = Math.floor((touch.clientY - offsetY) / (scale * CELL_SIZE));
-                    tryPlacePixel(clickX, clickY);
-                }
-            }
-            isDragging = false;
-            isPanning = false;
-        });
+        viewport.addEventListener('touchend', () => { isMouseDown = false; });
 
-        palette.addEventListener('click', (e) => {
+        // 縮放功能
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoom = e.deltaY < 0 ? 1.15 : 0.85;
+            scale = Math.max(0.1, Math.min(scale * zoom, 20));
+            render();
+        }, { passive: false });
+
+        // 調色盤選擇
+        document.getElementById('palette').addEventListener('click', (e) => {
             if (e.target.classList.contains('color-btn')) {
-                const activeBtn = document.querySelector('.color-btn.active') || document.querySelector('.color-custom-label.active');
-                if (activeBtn) activeBtn.classList.remove('active');
+                document.querySelectorAll('.color-btn, .color-custom-label').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 selectedColor = e.target.getAttribute('data-color');
             }
         });
 
-        customColorPicker.addEventListener('input', (e) => {
-            const activeBtn = document.querySelector('.color-btn.active') || document.querySelector('.color-custom-label.active');
-            if (activeBtn) activeBtn.classList.remove('active');
-            customColorLabel.classList.add('active');
+        document.getElementById('custom-color-picker').addEventListener('input', (e) => {
             selectedColor = e.target.value;
-            customColorLabel.style.background = selectedColor;
-        });
-        
-        customColorLabel.addEventListener('click', () => {
-            const activeBtn = document.querySelector('.color-btn.active') || document.querySelector('.color-custom-label.active');
-            if (activeBtn) activeBtn.classList.remove('active');
-            customColorLabel.classList.add('active');
-            selectedColor = customColorPicker.value;
+            document.getElementById('custom-color-label').style.background = selectedColor;
         });
 
-        window.addEventListener('resize', () => { requestRender(); });
         centerCanvas();
     </script>
 </body>
